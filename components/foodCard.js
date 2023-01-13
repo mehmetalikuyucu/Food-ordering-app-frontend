@@ -1,33 +1,43 @@
 import { Box, Heading, Stack, Image, Flex, Text, Button } from '@chakra-ui/react'
 import React from 'react'
+import { useStore } from '../store/store'
 
-const FoodCard = () => {
-  const food = {
-    title: 'Izgara',
-    image: 'kebap.jpg',
-    price: '0.05',
-    dec: 'Exercitation dolor ex non consectetur id.',
-    restoran: 'mercanlar ızgara'
-  }
-  
-  return (
-    <Stack direction={'column'}>
-      <Box width={'300px'} p={2} shadow={'2xl'} border={'1px solid'}>
-        <Image src={`${food.image}`}></Image>
-        <Stack direction={'column'} spacing={'5px'}>
-          <Flex justifyContent={'space-between'} alignItems={'center'}>
-            <Heading fontSize={'xl'}>{food.title}</Heading>
-            <Text fontWeight={'medium'}>{food.price} ether</Text>
-          </Flex>
-          <Text>{food.dec}</Text>
-          <Flex justifyContent={'flex-end'}>
-            <Text fontSize={'smaller'}>{food.restoran}</Text>
-                  </Flex>
-                  <Button>Add to cart</Button>
+const FoodCard = ({ food, price, index }) => {
+    return (
+        <Stack
+            direction={'column'}
+            key={index}>
+            <Box
+                width={'350px'}
+                height={'350px'}
+                p={2}
+                shadow={'2xl'}
+                border={'1px solid'}>
+                <Image
+                    src={`${food.imageLink}`}
+                    width={'350px'}
+                    height={'200px'}></Image>
+                <Stack
+                    direction={'column'}
+                    spacing={'5px'}>
+                    <Flex
+                        justifyContent={'space-between'}
+                        alignItems={'center'}>
+                        <Heading fontSize={'xl'}>{food.name}</Heading>
+                        <Text fontWeight={'medium'}>{price} BC Token</Text>
+                    </Flex>
+                    <Text>{food.desc}</Text>
+                    <Flex justifyContent={'flex-end'}>
+                        <Text fontSize={'smaller'}>{food.resOwner}</Text>
+                    </Flex>
+                    <Flex justifyContent={'flex-end'}>
+                        <Text fontSize={'smaller'}>{food.isActive ? 'on sell' : 'out sell'}</Text>
+                    </Flex>
+                    <Button>Add to Cart</Button>
+                </Stack>
+            </Box>
         </Stack>
-      </Box>
-    </Stack>
-  )
+    )
 }
 
 export default FoodCard

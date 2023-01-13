@@ -1,22 +1,34 @@
 import {
   Button,
-  ButtonGroup,
   Flex,
   Heading,
   HStack,
-  Input,
   Stack
 } from '@chakra-ui/react'
-import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { ethers } from 'ethers'
-import Contract from '../public/BlockCart.json'
-const contractAdress = '0x6019b5aca05db82032fa0fab5163c6ec842e83db'
+
+import { useClientStore } from '../store/store'
+import RestaurantForm from './createAccountComponents/restaurantForm'
+import CourrierForm from './createAccountComponents/courrierForm'
+import CustomerForm from './createAccountComponents/customerForm'
+
 
 const CreateAccount = () => {
-  const typeClients = ['Restaurant', 'Customer']
-  const [typeClient, setTypeClient] = useState('Customer')
-  const { register, handleSubmit } = useForm()
+  
+  const selectedClient = useClientStore(state => state.selectedClient)
+  const typeClients = useClientStore(state => state.clients)
+  const setSelectedClient = useClientStore(state => state.setSelectedClient)
+  
+
+  
+
+  /*
+const loglama=useContractStore(state=>state.setConnected)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm()
+
 
   const onSubmit = d => {
     if (typeClient === 'Customer') {
@@ -26,44 +38,42 @@ const CreateAccount = () => {
     }
   }
 
-  const abi = Contract.abi
-
-  const contractConnect = async abi => {
+ const contractConnect = async() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum)
     await provider.send('eth_requestAccounts', [])
     const signer = provider.getSigner()
     const contract = new ethers.Contract(contractAdress, abi, provider)
     return { contract, signer }
-  }
+  }  
 
   const createCustomerAccount = async (adres, mail) => {
-    const { contract, signer } = await contractConnect(abi)
+    const { contract, signer } = await contractConnect
     const contractWithSigner = contract.connect(signer)
-    try {
-      contractWithSigner.createCustomer(adres, mail)
-    } catch (error) {
-      alert(error)
-      return error
-    }
+    contractWithSigner
+      .createCustomer(adres, mail)
+      .then(tx => console.log(tx))
+      .catch(e => {
+        console.log(e)
+        alert('hesap oluşturulamadı')
+      })
     contract.on('CreateCustomer', e => console.log(e))
   }
 
   const createRestaurantAccount = async (name, desc) => {
-    const { contract, signer } = await contractConnect(abi)
+    const { contract, signer } = await contractConnect()
     const contractWithSigner = contract.connect(signer)
-    contractWithSigner.createRestaurant(name, desc).then(tx => console.log(tx)).catch(e => {
-      if (e.code === 4001) {
-        return false
-      }
-    })
-  
-    
-    
+    contractWithSigner
+      .createRestaurant(name, desc)
+      .then(tx => console.log(tx.gasPrice))
+      .catch(e => {
+        console.log(e)
+        alert('hesap oluşturulamadı')
+      })
+
+    console.log('restoran 1', await contractWithSigner.restaurants(0))
     contract.on('CreateRestaurant', (e, _name) => console.log(e, _name))
-
-  }
-
-  useEffect(() => {}, [])
+  } 
+  */
 
   return (
     <>
@@ -80,51 +90,27 @@ const CreateAccount = () => {
           padding={5}
           borderRadius={5}
         >
-          <Heading>Create a {typeClient} Account</Heading>
+          <Heading>Create a {selectedClient} Account</Heading>
           <HStack>
-            {typeClients.map(i => {
-              return <Button onClick={() => setTypeClient(i)}>{i}</Button>
+            {typeClients.map((client, index) => {
+              return (
+                <Button                  
+                  key={index}
+                  variant={selectedClient===client?'outline':''}
+                  onClick={() => setSelectedClient(client)}
+                  borderColor={'black'}
+                  bgColor={'white'}
+                  shadow={'xl'}
+                >
+                  {client}
+                </Button>
+              )
             })}
           </HStack>
-          {typeClient === 'Restaurant'
-            ? handleForm(
-                handleSubmit,
-                onSubmit,
-                register,
-                'name',
-                'description'
-              )
-            : handleForm(handleSubmit, onSubmit, register, 'adres', 'mail')}
+          {selectedClient==='Restaurant'?<RestaurantForm></RestaurantForm>:selectedClient==='Customer'?<CustomerForm></CustomerForm>:<CourrierForm></CourrierForm>}
         </Stack>
       </Flex>
     </>
-  )
-}
-
-const handleForm = (handleSubmit, onSubmit, register, arg1, arg2) => {
-  return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack
-        direction={'column'}
-        justifyContent={'center'}
-        alignItems={'center'}
-        spacing={'20px'}
-      >
-        <Input
-          {...register(arg1)}
-          placeholder={arg1}
-          borderColor={'black'}
-        ></Input>
-        <Input
-          {...register(arg2)}
-          placeholder={arg2}
-          borderColor={'black'}
-        ></Input>
-        <Button type='submit' value={'submit'}>
-          Create
-        </Button>
-      </Stack>
-    </form>
   )
 }
 
